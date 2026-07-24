@@ -1,0 +1,24 @@
+name: Keep Alive
+on:
+  schedule:
+    # 每月1号 UTC 0点 自动执行保活提交
+    - cron: '0 0 1 * *'
+  workflow_dispatch: # 支持手动点击运行保活
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v4
+
+      - name: 生成保活标记文件
+        run: |
+          echo "$(date -u)" > .keepalive.tmp
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .keepalive.tmp
+          git commit -m "🤖 Auto keep alive commit"
+          git push
